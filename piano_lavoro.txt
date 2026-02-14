@@ -1,0 +1,37 @@
+Piano di lavoro per clinical longitudinal data:
+- STEP 1 PREPROCESSING
+  sequenze T=6, split per paziente, normalizzazione corretta, dataset salvato in npz
+- STEP 2 BASELINE GRU SU DATI REALI
+  scopo: stabilire il benchmark massimo realistico. 
+  Concettualmente:
+  1. do X_train e y_train alla GRU 
+  2. valuto su X_test (pazienti mai visti)
+  3. ottenngo le mie metriche (MSE, MAE, R2)
+  e quindi so quanto bene posso predire motor_UPDRS usando 6 visite passate (questo sarà il mio upper bound real)
+- STEP 3: ANALISI PERFORMANCE
+  Vado a guardare distribuzione errori, scatter plot (pred vs true), controllare se il modello è biasato verso la media, verifico overfitting
+- STEP 4 GENERATIVE MODEL (TS-cVAE) -> non predice ma genera
+  Costruisco un modello che:
+  1. impara la distribuzione delle sequenze cliniche
+  2. genera nuove sequenze sintetiche
+- STEP 5 FIDELITY EVALUATION
+  mi chiedo: le sequenze sintetiche assomigliano alle reali?
+  metriche: KS test per feature, Wasserstein distance, distanza matrici di correlazione
+- STEP 6: UTILITY EVALUATION
+  qui devo fare: train GRU su dati sintetici, test su dati reali
+  se la performance è vicina alla baseline real significa che i dati sintetici sono utili
+- STEP 7 PRIVACY CHECK
+  vado a valutare due cose:
+  1. distanza nearest neighbor synth-real
+  2. rischio di memorizzazione
+  praticamente vado a dire che non sto copiando pazienti reali.
+- STEP 8 REPORT FINALE
+  faccio report sulla parte Parkinson che includa: descrizione pipeline, baseline real performance, generative model description
+  fidelity metrics, utility metrics, discussione limiti.
+
+  Cosa potrei aggiungere per un progetto serio:
+  - nuova architettura per dati longitudinale, nuovo schema di valutazione utility, migliore trade-off privacy-utility, studio teorico della stabilità del generative model
+  - evaluation molto più rigorosa: ora sto facendo train/test split, MSE, utility synth->real ma potrei aggiungere cross-validation per paziente, confidence intervals, statistical significance testing, ablation study (T=3, 6, 12), sensitivity analysis
+  - privacy formale (non solo empirica): tipo differential privacy, membership inference formalizzata, eps-privacy bound, theoretical privacy guarantees
+  - modeling più sofisticato: ora ho GRU baseline e TS-VAE semplice ma potrei confrontare GRU vs Transformer, introdurre latent dynamic models, usare Neural ODE, modeling multi-task (motor + total UPDRS), uncertainty quantification
+  - generalizzazione cross-dataset: qui ho 3 dataset separati, ma potrei fare trasferimento tra dataset, domain adaptation, multi-site robustness
